@@ -1,0 +1,26 @@
+[Unit]
+Description=Service for WordPress
+After=docker.service
+PartOf=docker.service
+
+[Service]
+WorkingDirectory=%h/wordpress
+
+ExecStartPre=/usr/bin/docker-compose pull
+ExecStart=/usr/bin/docker-compose up
+ExecStartPost=/bin/sleep 60
+#ExecStartPost=/bin/bash -c 'docker-compose exec -T --user mysql mariadb mysql_upgrade -u root -p$(sed -n -r "s/[ -]+MYSQL_ROOT_PASSWORD[ =]+//p" %h/wordpress/docker-compose.yml)'
+#ExecStartPost=/usr/bin/docker-compose exec --user mysql mariadb sh -c 'mysql_upgrade -u root "-p${MYSQL_ROOT_PASSWORD}" || true'
+ExecStartPost=/bin/bash -c 'docker-compose exec --user mysql mariadb sh -c \'mysql_upgrade -u root "-p${MYSQL_ROOT_PASSWORD}"\' || true'
+
+#ExecStop=/usr/bin/docker-compose exec --user mysql mariadb sh -c 'mysql_upgrade -u root "-p${MYSQL_ROOT_PASSWORD}"'
+#ExecStop=/bin/bash -c 'docker-compose exec -T --user mysql mariadb mysql_upgrade -u root -p$(sed -n -r "s/[ -]+MYSQL_ROOT_PASSWORD[ =]+//p" %h/wordpress/docker-compose.yml)'
+ExecStop=/bin/bash -c 'docker-compose exec --user mysql mariadb sh -c \'mysql_upgrade -u root "-p${MYSQL_ROOT_PASSWORD}"\' || true'
+ExecStopPost=/usr/bin/docker-compose down
+
+Restart=always
+RestartSec=1min
+TimeoutStartSec=infinity
+
+[Install]
+WantedBy=docker.service

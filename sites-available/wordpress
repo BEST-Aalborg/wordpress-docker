@@ -1,0 +1,68 @@
+server {
+	listen 443 ssl http2;
+	
+#	ssl on;
+	ssl_certificate /etc/letsencrypt/live/best.aau.dk/fullchain.pem;
+	ssl_certificate_key /etc/letsencrypt/live/best.aau.dk/privkey.pem;
+	ssl_trusted_certificate /etc/letsencrypt/live/best.aau.dk/chain.pem;
+	include /etc/nginx/snippets/ssl.conf;
+
+	server_name best.aau.dk;
+
+	client_max_body_size 10G;
+
+	### Used by LetsEncrypt, without nginx will need to be stopped in order to renew ssl keys
+	include /etc/nginx/snippets/letsencrypt.conf;
+
+	### Proxy Pass to Varnish and  Add headers to recognize SSL
+	location / {
+		proxy_pass  http://wordpress;
+		include /etc/nginx/proxy_params;
+	}
+}
+
+server {
+	listen 443 ssl http2;
+
+#	ssl on;
+	ssl_certificate /etc/letsencrypt/live/www.best.aau.dk/fullchain.pem;
+	ssl_certificate_key /etc/letsencrypt/live/www.best.aau.dk/privkey.pem;
+	ssl_trusted_certificate /etc/letsencrypt/live/www.best.aau.dk/chain.pem;
+	include /etc/nginx/snippets/ssl.conf;
+
+	server_name www.best.aau.dk;
+
+	client_max_body_size 10G;
+
+	### Used by LetsEncrypt, without nginx will need to be stopped in order to renew ssl keys
+	include /etc/nginx/snippets/letsencrypt.conf;
+
+	### Proxy Pass to Varnish and  Add headers to recognize SSL
+	location / {
+		proxy_pass  http://wordpress;
+		include /etc/nginx/proxy_params;
+	}
+}
+
+server {
+	listen 443 ssl;
+
+	ssl on;
+	ssl_certificate /etc/letsencrypt/live/best.varum.dk/fullchain.pem;
+	ssl_certificate_key /etc/letsencrypt/live/best.varum.dk/privkey.pem;
+	ssl_trusted_certificate /etc/letsencrypt/live/best.varum.dk/chain.pem;
+	include /etc/nginx/snippets/ssl.conf;
+
+	server_name best.varum.dk;
+
+	client_max_body_size 10G;
+
+	### Used by LetsEncrypt, without nginx will need to be stopped in order to renew ssl keys
+	include /etc/nginx/snippets/letsencrypt.conf;
+
+	### Proxy Pass to Varnish and  Add headers to recognize SSL
+	location / {
+		proxy_pass  http://wordpress;
+		include /etc/nginx/proxy_params;
+	}
+}

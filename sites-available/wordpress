@@ -1,7 +1,6 @@
 server {
 	listen 443 ssl http2;
 	
-#	ssl on;
 	ssl_certificate /etc/letsencrypt/live/best.aau.dk/fullchain.pem;
 	ssl_certificate_key /etc/letsencrypt/live/best.aau.dk/privkey.pem;
 	ssl_trusted_certificate /etc/letsencrypt/live/best.aau.dk/chain.pem;
@@ -24,7 +23,6 @@ server {
 server {
 	listen 443 ssl http2;
 
-#	ssl on;
 	ssl_certificate /etc/letsencrypt/live/www.best.aau.dk/fullchain.pem;
 	ssl_certificate_key /etc/letsencrypt/live/www.best.aau.dk/privkey.pem;
 	ssl_trusted_certificate /etc/letsencrypt/live/www.best.aau.dk/chain.pem;
@@ -45,9 +43,8 @@ server {
 }
 
 server {
-	listen 443 ssl;
+	listen 443 ssl http2;
 
-	ssl on;
 	ssl_certificate /etc/letsencrypt/live/best.varum.dk/fullchain.pem;
 	ssl_certificate_key /etc/letsencrypt/live/best.varum.dk/privkey.pem;
 	ssl_trusted_certificate /etc/letsencrypt/live/best.varum.dk/chain.pem;

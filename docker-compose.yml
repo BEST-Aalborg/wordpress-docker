@@ -21,7 +21,25 @@ services:
       - mariadb
     volumes:
       - wordpress:/var/www/html
-      - ./wp-php-custom.ini:/usr/local/etc/php/conf.d/my-conf.ini
+      - ./wp-php-custom.ini:/usr/local/etc/php/conf.d/my-conf.ini:ro
+    environment:
+      - WORDPRESS_DB_HOST=mariadb
+      - WORDPRESS_DB_NAME=${MYSQL_DATABASE}
+      - WORDPRESS_DB_USER=${MYSQL_USER}
+      - WORDPRESS_DB_PASSWORD=${MYSQL_PASSWORD}
+
+  app-cron:
+    image: wordpress:cli
+    entrypoint:
+      - bash
+      - '-c'
+      - wp cv api job.execute auth=0 && sleep 300
+    user: '33:33'
+    restart: always
+    depends_on:
+      - mariadb
+    volumes:
+      - wordpress:/var/www/html
     environment:
       - WORDPRESS_DB_HOST=mariadb
       - WORDPRESS_DB_NAME=${MYSQL_DATABASE}

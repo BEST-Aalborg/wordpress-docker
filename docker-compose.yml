@@ -14,6 +14,19 @@ services:
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
 
+  mariadb-updater:
+    image: mariadb
+    entrypoint: 'mysql_upgrade --host=mariadb --user root "--password=${MYSQL_ROOT_PASSWORD}" || true'
+    depends_on:
+      - mariadb
+    volumes:
+      - mariadb:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+
   wordpress:
     image: wordpress
     restart: always
@@ -79,53 +92,6 @@ services:
       - WORDPRESS_DB_USER=${MYSQL_USER}
       - WORDPRESS_DB_PASSWORD=${MYSQL_PASSWORD}
 
-#  nginx:
-#    image: dvaerum/nginx-with-certbot-in-docker:latest
-#    restart: always
-#    volumes:
-#      - ./sites-available:/etc/nginx/sites-available:ro
-#      - letsencrypt:/etc/letsencrypt
-#    environment:
-#      - DOMAINS=best.aau.dk,www.best.aau.dk,best.varum.dk
-#      - NGINX_LOG_ACCESS=N
-#      - NGINX_LOG_ERROR=Y
-#    depends_on:
-#      - wordpress
-#
-#    ### NOTES for labels: ###
-#    # These labels are used to configure the container Traefik (https://doc.traefik.io/traefik/).
-#    # Traefik is used as our LB (Load Balander) for handling incoming connection and forward them
-#    # to the correct containers.
-#    labels:
-#      # Enable this container to be load balancered by Traefik
-#      - "traefik.enable=true"
-#
-#      # Select the endpoint from Traefik there which is used from incoming connection. Normally the endpoint `web`
-#      # is going to be on port 80 (HTTP).
-#      - "traefik.http.routers.wordpress_http.entrypoints=web"
-#      # List of all the domains there will forwarded to this container
-#      - "traefik.http.routers.wordpress_http.rule=Host(`best.aau.dk`, `www.best.aau.dk`, `best.varum.dk`)"
-#      # In order to select which port on this container the connections from Traefik should be farwarded to,
-#      # there needs to be defined a service.
-#      - "traefik.http.routers.wordpress_http.service=wordpress_http"
-#      # This service defineds that we load balancer should farward connections to port 80
-#      - "traefik.http.services.wordpress_http.loadbalancer.server.port=80"
-#
-#      # Select the endpoint from Traefik there which is used from incoming connection. Normally the endpoint `websecure`
-#      # is going to be on port 443 (HTTPS).
-#      - "traefik.tcp.routers.wordpress_https.entrypoints=websecure"
-#      # List of all the domains there will forwarded to this container
-#      - "traefik.tcp.routers.wordpress_https.rule=HostSNI(`best.aau.dk`, `www.best.aau.dk`, `best.varum.dk`)"
-#      # By default traefik will handle the encryption of connections and just forward the connection unencrypted,
-#      # but if you instead just want Traefik to forward the encrypted connection to the container,
-#      # set `tls.passthrough` to `true`.
-#      - "traefik.tcp.routers.wordpress_https.tls.passthrough=true"
-#      # To order to select which port on this container the connections from Traefik should be farwarded to,
-#      # there needs to be defined a service.
-#      - "traefik.tcp.routers.wordpress_https.service=wordpress_https"
-#      # This service defineds that we load balancer should farward connections to port 80
-#      - "traefik.tcp.services.wordpress_https.loadbalancer.server.port=443"
-
 
 volumes:
   wordpress:
@@ -141,11 +107,4 @@ volumes:
       o: bind
       type: none
       device: /data/wordpress/mariadb
-
-#  letsencrypt:
-#    driver: local
-#    driver_opts:
-#      o: bind
-#      type: none
-#      device: /data/wordpress/letsencrypt
 

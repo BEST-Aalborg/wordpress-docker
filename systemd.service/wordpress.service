@@ -1,22 +1,19 @@
 [Unit]
 Description=Service for WordPress
 After=docker.service
-PartOf=docker.service
 
 [Service]
 WorkingDirectory=%h/wordpress
 
-ExecStartPre=/usr/bin/docker-compose pull
-ExecStart=/usr/bin/docker-compose up
-ExecStartPost=/bin/sleep 60
-ExecStartPost=/usr/bin/env docker-compose exec -T --user mysql mariadb sh -c 'mysql_upgrade -u root "-p$${MYSQL_ROOT_PASSWORD}" || echo DATABASE UPDATE FAILED'
+ExecStartPre=/usr/bin/env docker-compose pull
+ExecStart=/usr/bin/env docker-compose up
 
-ExecStop=/usr/bin/env docker-compose exec -T --user mysql mariadb sh -c 'mysql_upgrade -u root "-p$${MYSQL_ROOT_PASSWORD}" || echo DATABASE UPDATE FAILED'
-ExecStopPost=/usr/bin/docker-compose down
+ExecStop=/usr/bin/env docker-compose down
 
 Restart=always
 RestartSec=1min
 TimeoutStartSec=infinity
 
 [Install]
-WantedBy=docker.service
+WantedBy=default.target
+
